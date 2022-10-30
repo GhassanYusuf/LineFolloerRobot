@@ -13,23 +13,23 @@
         pinMode(_pin, OUTPUT);
       }
 
-      bool State() {
+      bool state() {
         return digitalRead(_pin);
       }
 
-      void On() {
+      void on() {
         digitalWrite(_pin, HIGH);
       }
 
-      void Off() {
+      void off() {
         digitalWrite(_pin, LOW);
       }
 
-      void Toggle() {
+      void toggle() {
         digitalWrite(_pin, !State());
       }
 
-      void Blink(unsigned int interval) {
+      void blink(unsigned int interval) {
         if(millis() - _prvTime >= interval) {
           Toggle();
           _prvTime = millis();

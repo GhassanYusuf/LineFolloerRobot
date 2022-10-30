@@ -35,12 +35,12 @@
       }
 
       // Invert Motor Direction
-      void Invert() {
+      void invert() {
         _invert = !_invert;
       }
 
       // Move Forword
-      void Forward() {
+      void forward() {
         if(_invert == false) {
           digitalWrite(_in1_pin, LOW);
           digitalWrite(_in2_pin, HIGH);
@@ -51,7 +51,7 @@
       }
 
       // Move Backword
-      void Backward() {
+      void backward() {
         if(_invert == false) {
           digitalWrite(_in1_pin, HIGH);
           digitalWrite(_in2_pin, LOW);
@@ -62,17 +62,17 @@
       }
 
       // Motor Speed
-      void SetSpeed(uint8_t speed) {
+      void setSpeed(uint8_t speed) {
         analogWrite(_ena_pin, constrain(speed, 0, 255));
       }
 
       // Press Break
-      void Break() {
+      void breakOn() {
         digitalWrite(_ena_pin, LOW);
       }
 
       // Toggle Break
-      void ToggleBreak() {
+      void toggleBreak() {
         digitalWrite(_ena_pin, !digitalRead(_ena_pin));
       }
     

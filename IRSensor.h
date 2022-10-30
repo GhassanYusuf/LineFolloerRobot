@@ -16,17 +16,17 @@
       }
 
       // Inverts The Reading Result
-      void Invert() {
+      void invert() {
         _invert = !_invert;
       }
 
       // Setting The Threshold
-      void Threshold(int input) {
+      void threshold(int input) {
         _threshold = input;
       }
 
       // Function For Decision Making
-      bool Read() {
+      bool read() {
 
         // Reading The Input And Maping It
         int reading = map(analogRead(_pin), 0, 1023, 0, 100);

@@ -7,7 +7,8 @@
     BREAK,
     LEFT,
     RIGHT,
-    FORWARD
+    FORWARD,
+    BACKWARD
   };
 
   // Assign Analog Pin For Sensor

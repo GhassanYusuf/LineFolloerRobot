@@ -12,8 +12,8 @@
     RM.begin();
 
     // Setting The Motors Speed
-    LM.SetSpeed(255);    
-    RM.SetSpeed(255);
+    LM.setSpeed(255);    
+    RM.setSpeed(255);
     
   }
 
@@ -29,43 +29,43 @@
   void movment() {
     
     // Reading From Sensor
-    bool lx = LS.Read();
-    bool rx = RS.Read();
+    bool lx = LS.read();
+    bool rx = RS.read();
   
     // Movment Decision Making
     if(lx == false && rx == false) {
       if(State != FORWARD) {
         State = FORWARD;
         Serial.println("Move Forward");
-        LM.SetSpeed(255);
-        RM.SetSpeed(255);
-        LM.Forward();
-        RM.Forward();
+        LM.setSpeed(255);
+        RM.setSpeed(255);
+        LM.forward();
+        RM.forward();
       }
     } else if(lx == true && rx == false) {
       if(State != RIGHT) {
         State = RIGHT;
         Serial.println("Move Right");
-        LM.SetSpeed(100);
-        RM.SetSpeed(255);
-        LM.Forward();
-        RM.Forward();
+        LM.setSpeed(100);
+        RM.setSpeed(255);
+        LM.forward();
+        RM.forward();
       }
     } else if(lx == false && rx == true) {
       if(State != LEFT) {
         State = LEFT;
         Serial.println("Move Left");
-        LM.SetSpeed(255);
-        RM.SetSpeed(100);
-        LM.Forward();
-        RM.Forward();
+        LM.setSpeed(255);
+        RM.setSpeed(100);
+        LM.forward();
+        RM.forward();
       }
     } else {
       if(State != BREAK) {
         State = BREAK;
         Serial.println("Stop");
-        LM.Break();
-        RM.Break();
+        LM.breakOn();
+        RM.breakOn();
       }
     }
     
