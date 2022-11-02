@@ -1,6 +1,8 @@
   // Libraries Including
+  #include  "LED.h"
   #include  "MOTOR.h"
   #include  "IRSensor.h"
+  #include  "NewServo.h"
 
   // ROBO STATE
   enum RoboState {
@@ -35,3 +37,6 @@
   // Right Side Objects
   IRSensor  RS(RIGHT_SENSOR_PIN);
   MOTOR     RM(RIGHT_MOTOR_ENA_PIN, RIGHT_MOTOR_IN1_PIN, RIGHT_MOTOR_IN2_PIN);
+
+  // This Is The Rotate
+  NewServo  Rotate(2);

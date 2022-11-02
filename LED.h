@@ -3,8 +3,9 @@
 
     private:
 
-      uint8_t _pin;
-      unsigned long _prvTime = millis();
+      uint8_t       _pin      = 13;
+      bool          _invert   = false;
+      unsigned long _prvTime  = millis();
 
     public:
 
@@ -13,25 +14,37 @@
         pinMode(_pin, OUTPUT);
       }
 
+      void invert() {
+        _invert = !_invert;
+      }
+
       bool state() {
         return digitalRead(_pin);
       }
 
       void on() {
-        digitalWrite(_pin, HIGH);
+        if(_invert == false) {
+          digitalWrite(_pin, HIGH);
+        } else {
+          digitalWrite(_pin, !HIGH);
+        }
       }
 
       void off() {
-        digitalWrite(_pin, LOW);
+        if(_invert == false) {
+          digitalWrite(_pin, LOW);
+        } else {
+          digitalWrite(_pin, !LOW);
+        }
       }
 
       void toggle() {
-        digitalWrite(_pin, !State());
+        digitalWrite(_pin, !state());
       }
 
       void blink(unsigned int interval) {
         if(millis() - _prvTime >= interval) {
-          Toggle();
+          toggle();
           _prvTime = millis();
         }
       }

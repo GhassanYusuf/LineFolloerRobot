@@ -7,6 +7,20 @@
     // Serial Ports Start
     Serial.begin(9600);
 
+    // Starting The Servo
+    Rotate.begin();
+
+    // Setting Your Limits
+    Rotate.setMin(0);
+    Rotate.setMax(96);
+    Rotate.setInit(45);
+
+    // Go To Initial Position
+    Rotate.goInit();
+
+    // Move To 50% Between Your Limits
+    Rotate.percent(50);
+
     // Start Motors Libraries
     LM.begin();
     RM.begin();
