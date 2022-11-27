@@ -6,7 +6,7 @@
 
   // ROBO STATE
   enum RoboState {
-    BREAK,
+    STOP,
     LEFT,
     RIGHT,
     FORWARD,
@@ -28,7 +28,7 @@
   #define   RIGHT_MOTOR_IN2_PIN     11
 
   // ROBO STATE
-  RoboState State = BREAK;
+  RoboState State = STOP;
 
   // Left Side Objects
   IRSensor  LS(LEFT_SENSOR_PIN);  

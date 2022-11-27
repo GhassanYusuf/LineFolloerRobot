@@ -7,6 +7,10 @@
     // Serial Ports Start
     Serial.begin(9600);
 
+    // while(1) {
+    //   Serial.println(String(LS.raw()) + " " + String(RS.raw()));
+    // }
+
     // Starting The Servo
     Rotate.begin();
 
@@ -21,13 +25,25 @@
     // Move To 50% Between Your Limits
     Rotate.percent(50);
 
-    // Start Motors Libraries
+    // Start LEFT Motors
     LM.begin();
-    RM.begin();
+    LM.invert();
+    LM.forward();
+    LM.setMin(80);
+    LM.setMax(150);
+    LM.stop();    
 
-    // Setting The Motors Speed
-    LM.setSpeed(255);    
-    RM.setSpeed(255);
+    // Start Right Motors
+    RM.begin();
+    RM.invert();
+    RM.forward();
+    RM.setMin(80);
+    RM.setMax(150);
+    RM.stop();
+
+    // Inverting Sensors
+    // LS.invert();
+    // RS.invert();
     
   }
 
@@ -35,7 +51,6 @@
   void loop() {
     
     movment();
-    delay(100);
     
   }
 
@@ -51,8 +66,8 @@
       if(State != FORWARD) {
         State = FORWARD;
         Serial.println("Move Forward");
-        LM.setSpeed(255);
-        RM.setSpeed(255);
+        LM.goMin();
+        RM.goMin();
         LM.forward();
         RM.forward();
       }
@@ -60,26 +75,26 @@
       if(State != RIGHT) {
         State = RIGHT;
         Serial.println("Move Right");
-        LM.setSpeed(100);
-        RM.setSpeed(255);
-        LM.forward();
+        LM.goMax();
+        RM.goMax();
+        LM.backward();
         RM.forward();
       }
     } else if(lx == false && rx == true) {
       if(State != LEFT) {
         State = LEFT;
         Serial.println("Move Left");
-        LM.setSpeed(255);
-        RM.setSpeed(100);
+        LM.goMax();
+        RM.goMax();
         LM.forward();
-        RM.forward();
+        RM.backward();
       }
     } else {
-      if(State != BREAK) {
-        State = BREAK;
+      if(State != STOP) {
+        State = STOP;
         Serial.println("Stop");
-        LM.breakOn();
-        RM.breakOn();
+        LM.stop();
+        RM.stop();
       }
     }
     

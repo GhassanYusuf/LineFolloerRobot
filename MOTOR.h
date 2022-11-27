@@ -4,15 +4,17 @@
     private:
 
       // This Is The Control, Enable Pins
-      uint8_t _ena_pin  = 0;
-      uint8_t _in1_pin  = 0;
-      uint8_t _in2_pin  = 0;
+      uint8_t _ena_pin    = 0;
+      uint8_t _in1_pin    = 0;
+      uint8_t _in2_pin    = 0;
 
       // Set Speed Data
-      uint8_t _speed    = 0;
+      uint8_t _speed      = 0;
+      uint8_t _min_speed  = 0;
+      uint8_t _max_speed  = 255;
 
       // Invert The Direction
-      bool    _invert   = false;
+      bool    _invert     = false;
 
     public:
 
@@ -32,6 +34,16 @@
         digitalWrite(_in1_pin, LOW);
         digitalWrite(_in2_pin, LOW);
         _speed  = 255;
+      }
+
+      // Set Minimum Speed
+      void setMin(uint8_t value) {
+        _min_speed = value;
+      }
+
+      // Set Maximum Speed
+      void setMax(uint8_t value) {
+        _max_speed = value;
       }
 
       // Invert Motor Direction
@@ -62,18 +74,54 @@
       }
 
       // Motor Speed
-      void setSpeed(uint8_t speed) {
-        analogWrite(_ena_pin, constrain(speed, 0, 255));
+      void goMin() {
+        analogWrite(_ena_pin, _min_speed);
+      }
+
+      // Motor Speed
+      void goMax() {
+        analogWrite(_ena_pin, _max_speed);
+      }
+
+      // Motor Speed
+      void goSpeed(uint8_t speed) {
+        // Make Sure You Are Between The Limits
+        speed = constrain(speed, _min_speed, _max_speed);
+        // Analog 
+        analogWrite(_ena_pin, speed);
       }
 
       // Press Break
-      void breakOn() {
+      void stop() {
         digitalWrite(_ena_pin, LOW);
       }
 
       // Toggle Break
-      void toggleBreak() {
+      void toggleMove() {
         digitalWrite(_ena_pin, !digitalRead(_ena_pin));
+      }
+
+      // Command By Serial
+      void command(Stream &serial) {
+
+        // Print A Message
+        serial.print("Please Enter Your Position Value : ");
+
+        // Wait For User Input
+        while(!serial.available()) {}
+
+        // Read The Value Convert To Number
+        if(serial.available()) {
+          String x = serial.readStringUntil('\n');
+          while(serial.available()) {
+            serial.read();
+          }
+          serial.println();
+          x.trim();
+          serial.println(x);
+          goSpeed(x.toInt());
+        }
+        
       }
     
   };

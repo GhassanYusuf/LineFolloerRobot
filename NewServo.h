@@ -76,23 +76,23 @@
       }
 
       // Command By Serial
-      void command() {
+      void command(Stream &serial) {
 
         // Print A Message
-        Serial.print("Please Enter Your Position Value : ");
+        serial.print("Please Enter Your Position Value : ");
 
         // Wait For User Input
-        while(!Serial.available()) {}
+        while(!serial.available()) {}
 
         // Read The Value Convert To Number
-        if(Serial.available()) {
-          String x = Serial.readStringUntil('\n');
-          while(Serial.available()) {
-            Serial.read();
+        if(serial.available()) {
+          String x = serial.readStringUntil('\n');
+          while(serial.available()) {
+            serial.read();
           }
-          Serial.println();
+          serial.println();
           x.trim();
-          Serial.println(x);
+          serial.println(x);
           _servo.write(x.toInt());
         }
         

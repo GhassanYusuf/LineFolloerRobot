@@ -52,5 +52,9 @@
         }
         
       }
+
+      unsigned int raw() {
+        return analogRead(_pin);
+      }
     
   };
