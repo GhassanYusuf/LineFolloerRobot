@@ -5,25 +5,30 @@
   void setup() {
 
     // Serial Ports Start
-    Serial.begin(9600);
-
-    // while(1) {
-    //   Serial.println(String(LS.raw()) + " " + String(RS.raw()));
-    // }
+    terminal.begin(9600);
+    bluetooth.begin(9600);
+    analogReference(INTERNAL);
 
     // Starting The Servo
     Rotate.begin();
-
-    // Setting Your Limits
     Rotate.setMin(0);
-    Rotate.setMax(96);
-    Rotate.setInit(45);
-
-    // Go To Initial Position
+    Rotate.setMax(180);
+    Rotate.setInit(96);
     Rotate.goInit();
 
-    // Move To 50% Between Your Limits
-    Rotate.percent(50);
+    // Setting Your Limits
+    dsp1.begin();
+    dsp1.setMin(25);
+    dsp1.setMax(140);
+    dsp1.setInit(140);
+    dsp1.goInit();
+
+    // Setting Your Limits
+    dsp2.begin();
+    dsp2.setMin(13);
+    dsp2.setMax(143);
+    dsp2.setInit(13);
+    dsp2.goInit();
 
     // Start LEFT Motors
     LM.begin();
@@ -41,61 +46,61 @@
     RM.setMax(150);
     RM.stop();
 
-    // Inverting Sensors
-    // LS.invert();
-    // RS.invert();
-    
+    // Sensors Calibration
+    LS.threshold(589);
+    RS.threshold(603);
+
   }
 
   // Main uC Program Loop
   void loop() {
-    
-    movment();
-    
-  }
 
-  // Movment Algo
-  void movment() {
-    
-    // Reading From Sensor
-    bool lx = LS.read();
-    bool rx = RS.read();
-  
-    // Movment Decision Making
-    if(lx == false && rx == false) {
-      if(State != FORWARD) {
-        State = FORWARD;
-        Serial.println("Move Forward");
-        LM.goMin();
-        RM.goMin();
-        LM.forward();
-        RM.forward();
-      }
-    } else if(lx == true && rx == false) {
-      if(State != RIGHT) {
-        State = RIGHT;
-        Serial.println("Move Right");
-        LM.goMax();
-        RM.goMax();
-        LM.backward();
-        RM.forward();
-      }
-    } else if(lx == false && rx == true) {
-      if(State != LEFT) {
-        State = LEFT;
-        Serial.println("Move Left");
-        LM.goMax();
-        RM.goMax();
-        LM.forward();
+    // Movement
+    // movment(bluetooth);
+
+    // BLUETOOTH INTERCEPTION
+    if(bluetooth.available()) {
+
+      String x = bluetooth.readStringUntil('\n');
+      
+      clearSerial(bluetooth);
+
+      if(x == JSON_CMD_CL) {
+        
+        CURRENT_STOP = 0;
+        bluetooth.println(JSON_MSG_OK);
+
+      } 
+      
+      else if(x == JSON_CMD_CL) {
+        
         RM.backward();
-      }
-    } else {
-      if(State != STOP) {
-        State = STOP;
-        Serial.println("Stop");
-        LM.stop();
+        LM.backward();
+        RM.goMax();
+        LM.goMax();
+        
+        delay(100);
+
+        RM.backward();
+        LM.forward();
+        RM.goMax();
+        LM.goMax();
+
+        while(readAVG(RS, 30) == 0) {
+          
+        }
+
+        delay(50);
+
+        while(readAVG(RS, 30) == 1) {
+          
+        }
+
         RM.stop();
+        LM.stop();
+        
       }
+
     }
     
   }

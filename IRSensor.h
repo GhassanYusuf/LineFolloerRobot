@@ -6,7 +6,9 @@
       // Pin Settings
       uint8_t   _pin        = 0;
       bool      _invert     = false;
-      int       _threshold  = 50;
+      int       _min        = 0;
+      int       _max        = 0;
+      int       _threshold  = 500;
 
     public:
 
@@ -25,34 +27,34 @@
         _threshold = input;
       }
 
-      // Function For Decision Making
-      bool read() {
-
-        // Reading The Input And Maping It
-        int reading = map(analogRead(_pin), 0, 1023, 0, 100);
-
-        // Checking For Invert Signal
-        if(_invert == false) {
-
-          // Return Not Inverted Decision
-          if(reading > _threshold) {
-            return true;
-          } else {
-            return false;
-          }
-          
-        } else {
-          
-          // Return Inverted Decision
-          if(reading > _threshold) {
-            return false;
-          } else {
-            return true;
-          }
-        }
-        
+      // Get Threshold
+      int getThreshold() {
+        return _threshold;
       }
 
+      // Function For Decision Making
+      uint8_t read() {
+
+        // Do The Readings
+        int x = raw();
+        int y = _threshold;
+        int d = 0;
+
+        // Do The Deside Value
+        if( x < y ) {
+          d = 0;
+        } else if( x >= y) {
+          d = 1;
+        }
+
+        // Serial.println("Reading:" + String(x) + ", TH:" + String(y) + ", D:" + String(d));
+
+        // Return The Value
+        return d;
+
+      }
+
+      // Raw Reading
       unsigned int raw() {
         return analogRead(_pin);
       }

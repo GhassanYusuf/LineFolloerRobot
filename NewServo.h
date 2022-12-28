@@ -15,13 +15,13 @@
       uint8_t _prv_pos    = 0;      // History
 
       // Working With It
-      Servo             _servo;                 // Servo Object
+      Servo               _servo;   // Servo Object
 
       // Function To Check Before Writing
-      uint8_t verify(uint8_t input) {
+      void chkMove(uint8_t input) {
         if(input != _prv_pos) {
           _prv_pos = input;
-          return input;
+          _servo.write(input);
         }
       }
 
@@ -62,17 +62,20 @@
 
       // Go To Start Position
       void goMax() {
-        _servo.write(_min_pos);
+        chkMove(_min_pos);
+        // _servo.write(_min_pos);
       }
 
       // Go To Stop Position
       void goMin() {
-        _servo.write(_max_pos);
+        chkMove(_max_pos);
+        // _servo.write(_max_pos);
       }
 
       // Go To Initial Position
       void goInit() {
-        _servo.write(_init_pos);
+        chkMove(_init_pos);
+        // _servo.write(_init_pos);
       }
 
       // Command By Serial
@@ -101,25 +104,29 @@
       // Move With Specific Position Between Limits
       void move(uint8_t pos) {
         pos = constrain(pos, _min_pos, _max_pos);
-        _servo.write(pos);
+        chkMove(pos);
+        // _servo.write(pos);
       }
 
       // Percentage
       void percent(uint8_t pos) {
         pos = map(pos, 0, 100, _min_pos, _max_pos);
-        _servo.write(pos);
+        chkMove(pos);
+        // _servo.write(pos);
       }
 
       // Sweep Function
       void sweep(uint8_t start, uint8_t stop, unsigned int mDelay) {
         if(start < stop) {
           for(int i=start; i<stop; i++) {
-            move(i);
+            // move(i);
+            chkMove(i);
             delay(mDelay);
           }
         } else if(start > stop) {
           for(int i=start; i>stop; i--) {
-            move(i);
+            // move(i);
+            chkMove(i);
             delay(mDelay);
           }
         }
