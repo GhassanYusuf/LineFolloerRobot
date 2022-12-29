@@ -40,6 +40,10 @@
         _servo.attach(_pin);
       }
 
+      void end() {
+        _servo.detach();
+      }
+
       // Setting The Pin
       void setPin(uint8_t pin) {
         _pin = pin;

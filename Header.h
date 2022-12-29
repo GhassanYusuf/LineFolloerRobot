@@ -1,9 +1,9 @@
   // Libraries Including
   #include  "LED.h"
   #include  "MOTOR.h"
+  #include  "Sonar.h"
   #include  "IRSensor.h"
   #include  "NewServo.h"
-  #include  <NewPing.h>
   #include  <ArduinoJson.h>
   #include  <SoftwareSerial.h>
 
@@ -31,8 +31,10 @@
   #define   RIGHT                   2
 
   // Assign Analog Pin For Sensor
-  #define   LEFT_SENSOR_PIN         A0
-  #define   RIGHT_SENSOR_PIN        A1
+  #define   FRONT_LEFT_SENSOR_PIN   A0
+  #define   FRONT_RIGHT_SENSOR_PIN  A1
+  #define   BACK_LEFT_SENSOR_PIN    A5
+  #define   BACK_RIGHT_SENSOR_PIN   A4
 
   // Assign Pins For LEFT Motors
   #define   LEFT_MOTOR_ENA_PIN      6
@@ -45,11 +47,12 @@
   #define   RIGHT_MOTOR_IN2_PIN     11
 
   // ULTRA SONIC SENSOR
-  #define   USENSOR_TRIG            3
-  #define   USENSOR_ECHO            2
-  // RANG METER
-  NewPing   sonar(USENSOR_TRIG, USENSOR_ECHO, 200);
-  // TIME MEMORY
+  #define   FRONT_USENSOR_TRIG      3
+  #define   FRONT_USENSOR_ECHO      2
+  #define   BACK_USENSOR_TRIG       A5
+  #define   BACK_USENSOR_ECHO       A4
+  Sonar     FrontBumper(FRONT_USENSOR_TRIG, FRONT_USENSOR_ECHO);
+  Sonar     BackBumper(BACK_USENSOR_TRIG, BACK_USENSOR_ECHO);
   unsigned long prvTime             = millis();
 
   // STOP COUNT
@@ -60,11 +63,13 @@
   RoboState State = STOP;
 
   // Left Side Objects
-  IRSensor  LS(LEFT_SENSOR_PIN);  
+  IRSensor  FLS(FRONT_LEFT_SENSOR_PIN);
+  IRSensor  BLS(BACK_LEFT_SENSOR_PIN);
   MOTOR     LM(LEFT_MOTOR_ENA_PIN, LEFT_MOTOR_IN1_PIN, LEFT_MOTOR_IN2_PIN);
 
   // Right Side Objects
-  IRSensor  RS(RIGHT_SENSOR_PIN);
+  IRSensor  FRS(FRONT_RIGHT_SENSOR_PIN);
+  IRSensor  BRS(BACK_RIGHT_SENSOR_PIN);
   MOTOR     RM(RIGHT_MOTOR_ENA_PIN, RIGHT_MOTOR_IN1_PIN, RIGHT_MOTOR_IN2_PIN);
 
   // This Is The Rotate
@@ -74,21 +79,27 @@
   #define   PILL_DUMP_DELAY         600
 
   // Global Data Of Data Type
-  movData   command;
+  movData   postMan;
 
   // Created Global JSON Document
   DynamicJsonDocument               doc(200);
 
-  // Software Serial
+  // Serial Ports
+  #define   terminal                Serial
   SoftwareSerial                    bluetooth(A3, A2); // RX, TX
 
-  // Fixed JSON Message
-  #define   terminal                Serial
+  // Fix Defined Terms
   #define   NULL                    ""
+
+  // Commands
   #define   JSON_CMD_CL             "{\"COMMAND\":\"RESET\"}"
-  #define   JSON_CMD_TR             "{\"COMMAND\":\"TURN\"}"
+  #define   JSON_CMD_RO             "{\"COMMAND\":\"ROTATE\"}"
+
+  // Messages
   #define   JSON_MSG_OK             "{\"STATUS\":\"OK\"}"
   #define   JSON_MSG_ER             "{\"STATUS\":\"ERROR\"}"
-  #define   JSON_MSG_NA             "{\"STATUS\":\"INVALID - EXCEED LIMITS\"}"
-  #define   JSON_MSG_OB             "{\"STATUS\":\"OBJECT BLOCKING THE WAY\"}"
-  #define   JSON_MSG_TR             "{\"STATUS\":\"TURNNING AROUND & MOVING BACK\"}"
+  #define   JSON_MSG_EA             "{\"STATUS\":\"ANGLE ERROR ( 0 = Center, 1 = LEFT, 2 = RIGHT )\"}"
+  #define   JSON_MSG_NA             "{\"STATUS\":\"EXCEED LIMITS\"}"
+  #define   JSON_MSG_OB             "{\"STATUS\":\"OBJECT BLOCKING\"}"
+  #define   JSON_MSG_DF             "{\"STATUS\":\"DRIVING FORWARD\"}"
+  #define   JSON_MSG_DB             "{\"STATUS\":\"DRIVING BACKWARDS\"}"

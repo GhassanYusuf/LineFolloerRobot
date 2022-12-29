@@ -58,5 +58,70 @@
       unsigned int raw() {
         return analogRead(_pin);
       }
+
+      // Read Avarage Value
+      int readAVG(uint8_t times) {
+
+        int result = 0;
+
+        for(int i=0; i<times; i++) {
+          result += read();
+          delayMicroseconds(10);
+        }
+
+        result = result/times;
+
+        return result;
+
+      }
+
+      // Calibrate Sensor
+      int calibrate(Stream &serial) {
+
+        // Preparing Variables
+        int     x       = 0;
+        int     min     = 1203;
+        int     max     = 0;
+        String  buffer  = "";
+
+        // Display Message For User
+        serial.println("Place The Sensor On The Darkest And The Brightest Side For Some Time, Then Send 'close' in serial terminal To end the calibration");
+
+        // Infinit Loop
+        while(1) {
+
+          // Reading Raw Value
+          x = raw();
+
+          // Finding Max Value
+          if(x > max) {
+            max = x;
+          }
+
+          // Finding Min Vlaue
+          if(x < min) {
+            min = x;
+          }
+
+          // Calculate Treshold Value
+          int th = ((max - min)/2) + min;
+
+          // Display Reading
+          serial.println("MIN = " + String(min) + ", MAX = " + String(max) + ", TH VALUE = " + String(th));
+
+          // Wait For Serial Command To Exit Calibration
+          if(serial.available()) {
+            buffer = serial.readStringUntil("\n");
+            while(serial.available()) { serial.read(); }
+            buffer.trim();
+            if(buffer == "exit") {
+              _threshold = th;
+              return th;
+            }
+          }
+
+        }
+
+      }
     
   };
