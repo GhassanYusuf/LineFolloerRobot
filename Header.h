@@ -29,6 +29,8 @@
   #define   CENTER                  0
   #define   LEFT                    1
   #define   RIGHT                   2
+  #define   MOVE_FORWARD            true
+  #define   MOVE_BACKWARD           false
 
   // Assign Analog Pin For Sensor
   #define   FRONT_LEFT_SENSOR_PIN   A0
@@ -49,28 +51,27 @@
   // ULTRA SONIC SENSOR
   #define   FRONT_USENSOR_TRIG      3
   #define   FRONT_USENSOR_ECHO      2
+  Sonar     FrontBumper             (FRONT_USENSOR_TRIG, FRONT_USENSOR_ECHO);
   #define   BACK_USENSOR_TRIG       A5
   #define   BACK_USENSOR_ECHO       A4
-  Sonar     FrontBumper(FRONT_USENSOR_TRIG, FRONT_USENSOR_ECHO);
-  Sonar     BackBumper(BACK_USENSOR_TRIG, BACK_USENSOR_ECHO);
-  unsigned long prvTime             = millis();
+  Sonar     BackBumper              (BACK_USENSOR_TRIG, BACK_USENSOR_ECHO);
 
   // STOP COUNT
   #define   STOP_MAX                3
   uint8_t   CURRENT_STOP            = 0;
 
   // ROBO STATE
-  RoboState State = STOP;
+  RoboState State                   = STOP;
 
   // Left Side Objects
-  IRSensor  FLS(FRONT_LEFT_SENSOR_PIN);
-  IRSensor  BLS(BACK_LEFT_SENSOR_PIN);
-  MOTOR     LM(LEFT_MOTOR_ENA_PIN, LEFT_MOTOR_IN1_PIN, LEFT_MOTOR_IN2_PIN);
+  IRSensor  FLS                     (FRONT_LEFT_SENSOR_PIN);
+  IRSensor  BLS                     (BACK_LEFT_SENSOR_PIN);
+  MOTOR     LM                      (LEFT_MOTOR_ENA_PIN, LEFT_MOTOR_IN1_PIN, LEFT_MOTOR_IN2_PIN);
 
   // Right Side Objects
-  IRSensor  FRS(FRONT_RIGHT_SENSOR_PIN);
-  IRSensor  BRS(BACK_RIGHT_SENSOR_PIN);
-  MOTOR     RM(RIGHT_MOTOR_ENA_PIN, RIGHT_MOTOR_IN1_PIN, RIGHT_MOTOR_IN2_PIN);
+  IRSensor  FRS                     (FRONT_RIGHT_SENSOR_PIN);
+  IRSensor  BRS                     (BACK_RIGHT_SENSOR_PIN);
+  MOTOR     RM                      (RIGHT_MOTOR_ENA_PIN, RIGHT_MOTOR_IN1_PIN, RIGHT_MOTOR_IN2_PIN);
 
   // This Is The Rotate
   NewServo  Rotate(4);
@@ -97,6 +98,7 @@
 
   // Messages
   #define   JSON_MSG_OK             "{\"STATUS\":\"OK\"}"
+  #define   JSON_MSG_RC             "{\"STATUS\":\"RECEIVED\"}"
   #define   JSON_MSG_ER             "{\"STATUS\":\"ERROR\"}"
   #define   JSON_MSG_EA             "{\"STATUS\":\"ANGLE ERROR ( 0 = Center, 1 = LEFT, 2 = RIGHT )\"}"
   #define   JSON_MSG_NA             "{\"STATUS\":\"EXCEED LIMITS\"}"

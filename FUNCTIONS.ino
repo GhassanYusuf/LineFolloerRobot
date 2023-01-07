@@ -75,12 +75,6 @@
   }
 
 //======================================================
-//  ULTRASOUND
-//======================================================
-
-
-
-//======================================================
 //  TERMINATOR DETECTOR - LINE FOLLOWER
 //======================================================
 
@@ -92,9 +86,9 @@
     // If Message Empty Return
     if(Message == NULL) {
       return;
-    } 
+    }
     
-    // If Message Not Empty Check If It Was A postMan First OR Not
+    // If Message Not Empty Check If It Was A postMan Command Or Not
     else {
 
       // IF IT WAS POSITION RESET REQUEST
@@ -103,7 +97,7 @@
         writeDualComm("{\"STATUS\":\"POSITION = " + String(CURRENT_STOP) + "\"}");
         writeDualComm(JSON_MSG_OK);
         return;
-      } 
+      }
       
       // IF IT WAS ROTATE REQUEST
       else if(Message == JSON_CMD_RO) {
@@ -117,10 +111,9 @@
     if(decodeJSON(Message)) {
 
       // Print Message To User
-      writeDualComm("Signal Recived Successfully");
-      writeDualComm("New postMan   -> Bed Number : " + String(postMan.b) + ", Direction : " + String(postMan.d) + ", Pill (Type 1) : " + String(postMan.c1) + ", Pill (Type 2) : " + String(postMan.c2));
-      writeDualComm("Cur Position  -> " + String(CURRENT_STOP));
-      writeDualComm("Nxt Position  -> " + String(postMan.b - CURRENT_STOP) + " Bed");
+      writeDualComm(JSON_MSG_RC);
+      writeDualComm("{\"REQUEST\":\"BED " + String(postMan.b) + ", DIR " + String(postMan.d) + ", Pill (Type 1) : " + String(postMan.c1) + ", Pill (Type 2) : " + String(postMan.c2) + "\"}");
+      writeDualComm("{\"REQUEST\":\"CUR " + String(CURRENT_STOP) + ", NXT " + String(postMan.b - CURRENT_STOP) + "\"}");
 
       // Check If the Message Was New
       if(postMan.New == true) {
@@ -139,12 +132,12 @@
 
         }
         
-        // Continue Moving Forward & Line Follower
+        // Forward
         else if(postMan.b > CURRENT_STOP) {
 
           // The Loop Will Continue Till The postMan.b == CURRENT_STOP
           while(postMan.b > CURRENT_STOP) {
-            if(move()) {
+            if(move(MOVE_FORWARD)) {
               writeDualComm("{\"POSITION\":\"" + String(CURRENT_STOP) + "\"}");
               chargeRUN(120);
             }
@@ -155,12 +148,12 @@
 
         } 
         
-        // To Move The Opposit Direction & Line Follower
+        // Backward
         else if(postMan.b < CURRENT_STOP) {
 
           // The Loop Will Continue Till The postMan.b == CURRENT_STOP
-          while(postMan.b > CURRENT_STOP) {
-            if(move()) {
+          while(postMan.b < CURRENT_STOP) {
+            if(move(MOVE_BACKWARD)) {
               writeDualComm("{\"POSITION\":\"" + String(CURRENT_STOP) + "\"}");
               chargeRUN(120);
             }
@@ -196,36 +189,55 @@
 
 //------------------------------------------------------
 
-  void JustFollow() {
-    
-    // Will Move The Robot To Follow The Line Till Terminator Is Found
-    while(move() == false) { }
-    
-  }
+  bool move(bool dir) {
 
-//------------------------------------------------------
+    // Initiate Variables
+    int lx = 0;
+    int rx = 0;
 
-  bool move() {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Forward Moving Direction
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // Reading From Sensor
-    int lx    = FLS.readAVG(30);      // Left IR Sensor
-    int rx    = FRS.readAVG(30);      // Right IR Sensor
+    if(dir == FORWARD) {
+      // Reading From Sensor
+      lx = FLS.readAVG(30);      // Left IR Sensor
+      rx = FRS.readAVG(30);      // Right IR Sensor
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Backward Moving Direction
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    else {
+      // Reading From Sensor
+      lx = BLS.readAVG(30);      // Left IR Sensor
+      rx = BRS.readAVG(30);      // Right IR Sensor
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Movment Decision Making
     if(lx == 0 && rx == 0) {
+      // Move Forward
       stateFORWARD();
+      // The Terminator Line Not Meet
       return false;
     } 
     
     // Move Right
     else if(lx == 1 && rx == 0) {
+      // Steer Right
       stateRIGHT();
+      // The Terminator Line Not Meet
       return false;
     } 
     
     // Move Left
     else if(lx == 0 && rx == 1) {
+      // Steer Left
       stateLEFT();
+      // The Terminator Line Not Meet
       return false;
     }
 
