@@ -51,6 +51,13 @@
         _invert = !_invert;
       }
 
+      // To know what direction the motors are mooving
+      bool isInvert() {
+
+        return _invert;
+
+      }
+
       // Move Forword
       void forward() {
         if(_invert == false) {

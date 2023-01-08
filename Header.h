@@ -35,8 +35,8 @@
   // Assign Analog Pin For Sensor
   #define   FRONT_LEFT_SENSOR_PIN   A0
   #define   FRONT_RIGHT_SENSOR_PIN  A1
-  #define   BACK_LEFT_SENSOR_PIN    A5
-  #define   BACK_RIGHT_SENSOR_PIN   A4
+  #define   BACK_LEFT_SENSOR_PIN    A6
+  #define   BACK_RIGHT_SENSOR_PIN   A7
 
   // Assign Pins For LEFT Motors
   #define   LEFT_MOTOR_ENA_PIN      6
@@ -74,9 +74,9 @@
   MOTOR     RM                      (RIGHT_MOTOR_ENA_PIN, RIGHT_MOTOR_IN1_PIN, RIGHT_MOTOR_IN2_PIN);
 
   // This Is The Rotate
-  NewServo  Rotate(4);
-  NewServo  dsp1(7);
-  NewServo  dsp2(12);
+  NewServo  Rotate                  (4);
+  NewServo  dsp1                    (7);
+  NewServo  dsp2                    (12);
   #define   PILL_DUMP_DELAY         600
 
   // Global Data Of Data Type

@@ -107,7 +107,8 @@
           int th = ((max - min)/2) + min;
 
           // Display Reading
-          serial.println("MIN = " + String(min) + ", MAX = " + String(max) + ", TH VALUE = " + String(th));
+          // serial.println("MIN = " + String(min) + ", MAX = " + String(max) + ", TH VALUE = " + String(th));
+          serial.println(String(min) + ", " + String(max) + ", " + String(th));
 
           // Wait For Serial Command To Exit Calibration
           if(serial.available()) {

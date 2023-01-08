@@ -47,19 +47,28 @@
     RM.stop();
 
     // FRONT Sensors Calibration
-    FLS.threshold(589);
+    FLS.threshold(595);
     FRS.threshold(603);
 
     // BACK Sensors Calibration
-    BLS.threshold(589);
-    BRS.threshold(603);
+    BLS.threshold(575);
+    BRS.threshold(575);
 
   }
 
   // Main uC Program Loop
   void loop() {
 
-    // terminal.println(FrontBumper.read());
+    // Test Read The Line Sensors
+    // terminal.println(
+    //   String(FLS.read()) + ", " +
+    //   String(FRS.read()) + ", " +
+    //   String(BLS.read()) + ", " +
+    //   String(BRS.read())
+    // );
+
+    // Delay
+    // delay(25);
 
     // Movement
     operation();

@@ -5,7 +5,6 @@
   void stateFORWARD() {
     if(State != FORWARD) {
       State = FORWARD;
-      // Serial.println("Move Forward");
       LM.goMin();
       RM.goMin();
       LM.forward();
@@ -18,7 +17,6 @@
   void stateBACKWARD() {
     if(State != BACKWARD) {
       State = BACKWARD;
-      // Serial.println("Move Forward");
       LM.goMin();
       RM.goMin();
       LM.backward();
@@ -31,7 +29,6 @@
   void stateLEFT() {
     if(State != LEFT) {
       State = LEFT;
-      // Serial.println("Move Left");
       LM.goMax();
       RM.goMax();
       LM.forward();
@@ -44,7 +41,6 @@
   void stateRIGHT() {
     if(State != RIGHT) {
       State = RIGHT;
-      // Serial.println("Move Right");
       LM.goMax();
       RM.goMax();
       LM.backward();
@@ -57,7 +53,6 @@
   void stateSTOP() {
     if(State != STOP) {
       State = STOP;
-      // Serial.println("Move Left");
       LM.stop();
       RM.stop();
     }
@@ -65,13 +60,24 @@
 
 //------------------------------------------------------
   
-  void chargeRUN(int _delay) {
-    LM.goMax();
-    RM.goMax();
-    LM.forward();
-    RM.forward();
-    delay(_delay);
-    stateFORWARD();
+  void chargeRUN(int _delay, int _dir) {
+
+    if(_dir == MOVE_FORWARD) {
+      LM.goMax();
+      RM.goMax();
+      LM.forward();
+      RM.forward();
+      delay(_delay);
+      stateFORWARD();
+    } else {
+      LM.goMax();
+      RM.goMax();
+      LM.backward();
+      RM.backward();
+      delay(_delay);
+      stateBACKWARD();
+    }
+    
   }
 
 //======================================================
@@ -135,11 +141,14 @@
         // Forward
         else if(postMan.b > CURRENT_STOP) {
 
+          // Hot Start
+          chargeRUN(250, MOVE_FORWARD);
+
           // The Loop Will Continue Till The postMan.b == CURRENT_STOP
           while(postMan.b > CURRENT_STOP) {
             if(move(MOVE_FORWARD)) {
               writeDualComm("{\"POSITION\":\"" + String(CURRENT_STOP) + "\"}");
-              chargeRUN(120);
+              chargeRUN(250, MOVE_FORWARD);
             }
           }
 
@@ -151,11 +160,14 @@
         // Backward
         else if(postMan.b < CURRENT_STOP) {
 
+          // Hot Start
+          chargeRUN(250, MOVE_BACKWARD);
+
           // The Loop Will Continue Till The postMan.b == CURRENT_STOP
           while(postMan.b < CURRENT_STOP) {
             if(move(MOVE_BACKWARD)) {
               writeDualComm("{\"POSITION\":\"" + String(CURRENT_STOP) + "\"}");
-              chargeRUN(120);
+              chargeRUN(250, MOVE_BACKWARD);
             }
           }
 
@@ -192,17 +204,58 @@
   bool move(bool dir) {
 
     // Initiate Variables
-    int lx = 0;
-    int rx = 0;
-
+    int fls = 0;
+    int frs = 0;
+    int bls = 0;
+    int brs = 0;
+    int dst = 0;
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Forward Moving Direction
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    if(dir == FORWARD) {
+    if(dir == MOVE_FORWARD) {
+
       // Reading From Sensor
-      lx = FLS.readAVG(30);      // Left IR Sensor
-      rx = FRS.readAVG(30);      // Right IR Sensor
+      fls = FLS.readAVG(30);      // Left IR Sensor
+      frs = FRS.readAVG(30);      // Right IR Sensor
+
+      // Movment Decision Making
+      if(fls == 0 && frs == 0) {
+        // Move Forward
+        stateFORWARD();
+        // The Terminator Line Not Meet
+        return false;
+      } 
+      
+      // Move Right
+      else if(fls == 1 && frs == 0) {
+        // Steer Right
+        stateRIGHT();
+        // The Terminator Line Not Meet
+        return false;
+      } 
+      
+      // Move Left
+      else if(fls == 0 && frs == 1) {
+        // Steer Left
+        stateLEFT();
+        // The Terminator Line Not Meet
+        return false;
+      }
+
+      // Terminator Detected
+      else if(fls == 1 && frs == 1) {
+        // STOP THE MOTORS
+        stateSTOP();
+        // Draft Delay
+        delay(250);
+        // Terminator Detected
+        CURRENT_STOP += 1;
+        // Return Success Flag
+        return true;
+      }
+      
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -210,48 +263,54 @@
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     else {
-      // Reading From Sensor
-      lx = BLS.readAVG(30);      // Left IR Sensor
-      rx = BRS.readAVG(30);      // Right IR Sensor
+
+      // Reading From Sensors For Line Following
+      bls = BLS.readAVG(30);  // Back LEFT IR Sensor
+      brs = BRS.readAVG(30);  // Back Right IR Sensor
+
+      // Reading From Sensor FOR TERMINATOR Detection
+      fls = FLS.readAVG(30);  // Left IR Sensor
+      frs = FRS.readAVG(30);  // Right IR Sensor
+
+      // Movment Decision Making
+      if(bls == 0 && brs == 0) {
+        // Move Forward
+        stateBACKWARD();
+        // The Terminator Line Not Meet
+        return false;
+      } 
+      
+      // Move Right
+      else if(bls == 1 && brs == 0) {
+        // Steer Right
+        stateRIGHT();
+        // The Terminator Line Not Meet
+        return false;
+      } 
+      
+      // Move Left
+      else if(bls == 0 && brs == 1) {
+        // Steer Left
+        stateLEFT();
+        // The Terminator Line Not Meet
+        return false;
+      }
+
+      // Terminator Detected
+      else if(bls == 1 && brs == 1) {
+        // STOP THE MOTORS
+        stateSTOP();
+        // Draft Delay
+        delay(250);
+        // Terminator Detected
+        CURRENT_STOP -= 1;
+        // Return Success Flag
+        return true;
+      }
+      
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Movment Decision Making
-    if(lx == 0 && rx == 0) {
-      // Move Forward
-      stateFORWARD();
-      // The Terminator Line Not Meet
-      return false;
-    } 
-    
-    // Move Right
-    else if(lx == 1 && rx == 0) {
-      // Steer Right
-      stateRIGHT();
-      // The Terminator Line Not Meet
-      return false;
-    } 
-    
-    // Move Left
-    else if(lx == 0 && rx == 1) {
-      // Steer Left
-      stateLEFT();
-      // The Terminator Line Not Meet
-      return false;
-    }
-
-    // Terminator Detected
-    else {
-      // STOP THE MOTORS
-      stateSTOP();
-      // Draft Delay
-      delay(250);
-      // Terminator Detected
-      CURRENT_STOP += 1;
-      // Return Success Flag
-      return true;
-    }
 
   }
 
