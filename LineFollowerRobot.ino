@@ -54,6 +54,10 @@
     BLS.threshold(575);
     BRS.threshold(575);
 
+    // Testing
+    FrontBumper.begin();
+    BackBumper.begin();
+
   }
 
   // Main uC Program Loop
@@ -72,5 +76,9 @@
 
     // Movement
     operation();
+
+    // terminal.println(String(FrontBumper.read()) + ", " + String(BackBumper.read()));
+    // terminal.println(BackBumper.read());    
+    // delay(200);
     
   }

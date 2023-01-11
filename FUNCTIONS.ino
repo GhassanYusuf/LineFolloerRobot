@@ -148,7 +148,7 @@
           while(postMan.b > CURRENT_STOP) {
             if(move(MOVE_FORWARD)) {
               writeDualComm("{\"POSITION\":\"" + String(CURRENT_STOP) + "\"}");
-              chargeRUN(250, MOVE_FORWARD);
+              // chargeRUN(250, MOVE_FORWARD);
             }
           }
 
@@ -167,7 +167,7 @@
           while(postMan.b < CURRENT_STOP) {
             if(move(MOVE_BACKWARD)) {
               writeDualComm("{\"POSITION\":\"" + String(CURRENT_STOP) + "\"}");
-              chargeRUN(250, MOVE_BACKWARD);
+              // chargeRUN(250, MOVE_BACKWARD);
             }
           }
 
@@ -216,6 +216,22 @@
 
     if(dir == MOVE_FORWARD) {
 
+      // FRONT OBJECT - STOP MOTORS
+      if(FrontBumper.read() < 12) {
+
+        // Press Breaks        
+        stateSTOP();
+
+        // Wait For Object Removal
+        while(FrontBumper.read() < 12) {
+          
+        }
+
+        // To Move Robot
+        chargeRUN(100, MOVE_FORWARD);
+        
+      }
+
       // Reading From Sensor
       fls = FLS.readAVG(30);      // Left IR Sensor
       frs = FRS.readAVG(30);      // Right IR Sensor
@@ -249,7 +265,7 @@
         // STOP THE MOTORS
         stateSTOP();
         // Draft Delay
-        delay(250);
+        delay(350);
         // Terminator Detected
         CURRENT_STOP += 1;
         // Return Success Flag
@@ -263,6 +279,22 @@
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     else {
+
+      // BACK OBJECT - STOP MOTORS
+      if(BackBumper.read() < 12) {
+
+        // Press Breaks        
+        stateSTOP();
+
+        // Wait For Object Removal
+        while(BackBumper.read() < 12) {
+          
+        }
+
+        // To Move Robot
+        chargeRUN(100, MOVE_BACKWARD);
+        
+      }
 
       // Reading From Sensors For Line Following
       bls = BLS.readAVG(30);  // Back LEFT IR Sensor
@@ -301,7 +333,7 @@
         // STOP THE MOTORS
         stateSTOP();
         // Draft Delay
-        delay(250);
+        delay(350);
         // Terminator Detected
         CURRENT_STOP -= 1;
         // Return Success Flag
